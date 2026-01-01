@@ -4,11 +4,6 @@ on:
   push:
   pull_request:
   workflow_dispatch:
-    inputs:
-      request_production_approval:
-        description: 'Set to true to enable the production approval gate for this manual run'
-        required: true
-        default: 'false'
 
 permissions:
   contents: read
@@ -92,8 +87,6 @@ jobs:
     runs-on: ubuntu-latest
     # wait up to 3 days for manual approval in the GitHub UI
     timeout-minutes: 4320
-    # only run the production approval gate for non-dispatch runs or when the dispatch input is true
-    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.request_production_approval == 'true' }}
     environment: production
     steps:
       - name: Await approval for production
