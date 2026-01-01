@@ -82,8 +82,21 @@ jobs:
           echo "Deploying to QA environment"
           # TODO: replace with your QA deploy commands
 
-  deploy-prod:
+  approve-production:
     needs: deploy-qa
+    runs-on: ubuntu-latest
+    # wait up to 3 days for manual approval in the GitHub UI
+    timeout-minutes: 4320
+    environment: production
+    steps:
+      - name: Await approval for production
+        run: |
+          echo "This job is the manual approval gate for production."
+          echo "Please approve this run via Settings → Environments → production (or via the Checks page in this run)."
+          echo "Once an authorized reviewer approves the 'production' environment, this job will continue."
+
+  deploy-prod:
+    needs: approve-production
     runs-on: ubuntu-latest
     environment: production
     steps:
