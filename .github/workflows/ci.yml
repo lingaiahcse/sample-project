@@ -3,6 +3,7 @@ name: CI
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -36,20 +37,85 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Build production bundle
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifact
+          path: build
+
+  deploy-dev:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifact
+          path: ./build
+
+      - name: Deploy to dev
+        run: |
+          echo "Deploying to dev environment"
+          # TODO: replace with your deploy commands (scp/rsync/gh-pages/Cloud CLI)
+  
+  deploy-qa:
+    needs: deploy-dev
+    runs-on: ubuntu-latest
+    environment: qa
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifact
+          path: ./build
+
+      - name: QA deployment gate
+        run: |
+          echo "Deployment to QA uses GitHub environment protections (approve in repo settings) if configured."
+
+      - name: Deploy to QA
+        run: |
+          echo "Deploying to QA environment"
+          # TODO: replace with your QA deploy commands
+
+  deploy-prod:
+    needs: deploy-qa
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifact
+          path: ./build
+
+      - name: Production deployment gate
+        run: |
+          echo "Deployment to production should require approval via the 'production' environment protections."
+
+      - name: Deploy to Production
+        run: |
+          echo "Deploying to production environment"
+          # TODO: replace with your production deploy commands
+
   # codeql:
   #   needs: build
   #   runs-on: ubuntu-latest
   #   steps:
   #     - uses: actions/checkout@v4
-
+  #
   #     - name: Initialize CodeQL
   #       uses: github/codeql-action/init@v2
   #       with:
   #         languages: javascript, python
-
+  #
   #     - name: Autobuild
   #       uses: github/codeql-action/autobuild@v2
-
+  #
   #     - name: Run CodeQL analysis
   #       uses: github/codeql-action/analyze@v2
 
