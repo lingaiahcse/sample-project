@@ -4,8 +4,8 @@ import App from './App';
 import '@testing-library/jest-dom';
 
 describe('App', () => {
-  it('renders hello bittu', () => {
+  it('renders hello banti', () => {
     render(<App />);
-    expect(screen.getByText(/hello bittu/i)).toBeInTheDocument();
+    expect(screen.getByText(/hello banti/i)).toBeInTheDocument();
   });
 });
