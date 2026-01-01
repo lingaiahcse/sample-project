@@ -57,11 +57,11 @@ jobs:
           name: build-artifact
           path: ./dist
 
-      - name: Deploy to dev
+      - name: Deploy to Dev
         run: |
           echo "Deploying to dev environment"
-          # TODO: replace with your deploy commands (scp/rsync/gh-pages/Cloud CLI)
-  
+          # TODO: add dev deploy commands
+
   deploy-qa:
     needs: deploy-dev
     runs-on: ubuntu-latest
@@ -73,31 +73,15 @@ jobs:
           name: build-artifact
           path: ./dist
 
-      - name: QA deployment gate
-        run: |
-          echo "Deployment to QA uses GitHub environment protections (approve in repo settings) if configured."
-
       - name: Deploy to QA
         run: |
           echo "Deploying to QA environment"
-          # TODO: replace with your QA deploy commands
-
-  approve-production:
-    needs: deploy-qa
-    runs-on: ubuntu-latest
-    # wait up to 3 days for manual approval in the GitHub UI
-    timeout-minutes: 4320
-    environment: production
-    steps:
-      - name: Await approval for production
-        run: |
-          echo "This job is the manual approval gate for production."
-          echo "Please approve this run via Settings → Environments → production (or via the Checks page in this run)."
-          echo "Once an authorized reviewer approves the 'production' environment, this job will continue."
+          # TODO: add QA deploy commands
 
   deploy-prod:
-    needs: approve-production
+    needs: deploy-qa
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - name: Download build artifact
         uses: actions/download-artifact@v4
@@ -105,29 +89,7 @@ jobs:
           name: build-artifact
           path: ./dist
 
-      - name: Production deployment gate
-        run: |
-          echo "Deployment to production should require approval via the 'production' environment protections."
-
       - name: Deploy to Production
         run: |
           echo "Deploying to production environment"
-          # TODO: replace with your production deploy commands
-
-  # codeql:
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #
-  #     - name: Initialize CodeQL
-  #       uses: github/codeql-action/init@v2
-  #       with:
-  #         languages: javascript, python
-  #
-  #     - name: Autobuild
-  #       uses: github/codeql-action/autobuild@v2
-  #
-  #     - name: Run CodeQL analysis
-  #       uses: github/codeql-action/analyze@v2
-
+          # TODO: add production deploy commands
